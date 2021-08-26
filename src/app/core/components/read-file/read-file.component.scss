@@ -1,0 +1,16 @@
+input {
+  margin: 1em;
+}
+
+button {
+  margin: 1em;
+}
+
+.viewer {
+  margin: 1em;
+  display: block;
+  border: 1px solid lightblue;
+  padding: 1em;
+  max-height: 500px;
+  overflow: auto;
+}

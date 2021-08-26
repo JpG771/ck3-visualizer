@@ -1,0 +1,41 @@
+<p>To read a CK3 save file :</p>
+<ol>
+  <li>Save game manually, automatic save are different.</li>
+  <li>
+    Edit your save file with Notepad++ or other editor to remove the text
+    portion. Saves are normally located at "Users\[your
+    username]\Documents\Paradox Interactive\Crusader Kings III\save games\".
+    <img src="/assets/images/save_deletepart.jpg" alt="" />
+  </li>
+  <li>Save what's left into a new file and add the .zip suffix.</li>
+  <li>Unzip the new file and you should get a file name dataset.</li>
+  <li>Upload that file with the button below.</li>
+</ol>
+
+<input type="file" id="file-selector" [disabled]="!cancel" />
+
+<ng-container *ngIf="currentProgress > 0">
+  <mat-progress-bar
+    mode="determinate"
+    [value]="currentProgress"
+  ></mat-progress-bar>
+  <button mat-raised-button color="accent" (click)="cancel = true">
+    <mat-icon>cancel</mat-icon>
+    Cancel
+  </button>
+</ng-container>
+<div *ngIf="currentProgressLabel">
+  Current Status : {{ currentProgressLabel }}
+</div>
+<button *ngIf="ck3Service.currentData" mat-raised-button color="accent" [routerLink]="'/graph'">
+  <mat-icon>summarize</mat-icon>
+  Go to report
+</button>
+
+<!-- <ngx-json-viewer
+  #viewer
+  class="viewer"
+  [json]="fileCode"
+  [depth]="3"
+></ngx-json-viewer> -->
+<pre *ngIf="isDebug" class="viewer">{{ fileCode | json }}</pre>

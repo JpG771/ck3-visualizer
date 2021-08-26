@@ -1,0 +1,25 @@
+<nav>
+  <mat-toolbar color="primary">
+    <button
+      mat-icon-button
+      class="menu"
+      aria-label="Menu"
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="app-title">CK3 Visualizer</span>
+    <span class="spacer"></span>
+  </mat-toolbar>
+</nav>
+
+<mat-menu #menu="matMenu">
+  <a mat-menu-item routerLink="/">Accueil</a>
+  <a mat-menu-item routerLink="/file/read">Read file</a>
+  <ng-container *ngIf="ck3Service.currentData">
+    <hr />
+    <a mat-menu-item routerLink="/graph">Graphs</a>
+    <hr />
+  </ng-container>
+  <a mat-menu-item routerLink="/contact">Contact</a>
+</mat-menu>
