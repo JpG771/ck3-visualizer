@@ -115,7 +115,26 @@ export const GAMESTATE_STRUCTURE = {
       },
     },
   },
-  dead_unprunable: false,
+  dead_unprunable: {
+    variable: {
+      first_name: false,
+      birth: false,
+      was_playable: false,
+      culture: false,
+      faith: false,
+      dynasty_house: false,
+      skill: false,
+      mass: false,
+      traits: false,
+      family_data: {
+        child: false
+      },
+      dead_data: {
+        date: false,
+        domain: false
+      }
+    }
+  },
   characters: {
     dead_prunable: false,
   },

@@ -4,8 +4,7 @@ import {
   ChangeDetectionStrategy,
   AfterViewInit,
   OnDestroy,
-  ChangeDetectorRef,
-  ViewChild,
+  ChangeDetectorRef
 } from '@angular/core';
 import { Ck3Service } from '../../services/ck3.service';
 
@@ -77,8 +76,9 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   async readLines(lines: string[]) {
-    for (var line = 590390; line < lines.length; line++) {
+    for (var line = 0; line < lines.length; line++) {
       if (this.cancel) break;
+      //if (line > 690388) break;
       const currentLine = lines[line];
       let newProgress = Math.round((line / lines.length) * 1000) / 10;
       if (newProgress < 2) newProgress = 2;
@@ -150,7 +150,11 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
     return '';
   }
 
-  /** Should we create a new object, assign value, close object? */
+  /** 
+   * Should we create a new object, assign value, close object?
+   * Because of the chaotic data organisation, we need to verify each parts
+   * Multiple parts could be on same line or not
+   */
   private verifyValue(newProp: string): string {
     const fixedNewProp = newProp.trim();
     const indexOfEqual = fixedNewProp.indexOf('=');
@@ -186,20 +190,30 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     } else if (indexOfObjectOpen >= 0) {
       // Start new object
-      const value = fixedNewProp.slice(1);
       if (!this.skip) {
         this.skipLevel = this.currentLevel;
         this.openObject();
       }
       this.currentLevel++;
+      const value = fixedNewProp.slice(1);
       return this.verifyValue(value);
-    } else if (indexOfObjectClosure >= 0) {
+    } else if (indexOfObjectClosure > 0) {
+      // Data with object closure at the end or middle
+      if (this.currentPropName) {
+        const value = fixedNewProp.slice(0, indexOfObjectClosure);
+        this.setValue(value, this.currentPropName);
+      }
+      const valueLeft = fixedNewProp.slice(indexOfObjectClosure);
+      return this.verifyValue(valueLeft);
+    } else if (indexOfObjectClosure === 0) {
       this.currentLevel--;
       if (!this.skip || this.currentLevel === this.skipLevel) {
         this.skipLevel--;
         this.skip = false;
         this.closeObject();
       }
+      const value = fixedNewProp.slice(1);
+      return this.verifyValue(value);
     } else if (this.currentPropName) {
       this.setValue(fixedNewProp, this.currentPropName);
     } else if (!this.skip) {
@@ -209,7 +223,11 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setValue(value: string, propName: string) {
-    const fixedValue = value.trim().replace('"', '').replace('"', '');
+    let fixedValue = value.trim().replace('"', '').replace('"', '');
+    const currentValue = this.currentObject ? this.currentObject[propName] : this.fileCode[propName];
+    if (currentValue) {
+      fixedValue = currentValue + ' ' + fixedValue;
+    }
     if (this.currentObject) {
       this.currentObject[propName] = fixedValue;
     } else {
@@ -285,10 +303,21 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       'culture',
       'faith',
       'sexuality',
+      'dead_unprunable',
+      'characters',
+      'dead_prunable',
+      'dead_data',
+      'date'
     ];
+    let propNameNumber = 0;
+    if (this.currentPropName) { 
+      try {
+        propNameNumber = parseInt(this.currentPropName, 10);
+      } catch (error) {}
+    }
     if (
       (this.currentPropName && list.includes(this.currentPropName)) ||
-      (this.skip === false && this.currentLevel === 1)
+      (this.skip === false && propNameNumber > 0)
     ) {
       return true;
     }

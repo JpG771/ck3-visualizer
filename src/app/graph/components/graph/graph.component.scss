@@ -1,0 +1,28 @@
+@use '../../../shared/styles/mixins' as m;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  margin-bottom: 1em;
+
+  & > * {
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 1em;
+  }
+}
+
+@include m.desktop-screen {
+  .section {
+    flex-direction: row;
+
+    &.proportions > .mat-card {
+      width: 22%;
+      margin-right: 1%;
+    }
+    &.life > .mat-card {
+      width: 45%;
+    }
+  }
+}

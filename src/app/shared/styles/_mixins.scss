@@ -1,0 +1,19 @@
+@use 'common' as c;
+
+@mixin mobile-screen {
+  @media screen and (max-width: c.$mobileWidth) {
+    @content;
+  }
+}
+
+@mixin tablet-screen {
+  @media screen and (min-width: c.$tabletWidth) {
+    @content;
+  }
+}
+
+@mixin desktop-screen {
+  @media screen and (min-width: c.$desktopWidth) {
+    @content;
+  }
+}
