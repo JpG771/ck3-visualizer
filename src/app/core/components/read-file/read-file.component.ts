@@ -294,7 +294,6 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       } else {
         this.currentObject = {};
-        if (['culture', 'data', 'date'].includes(this.currentPropName)) debugger;
         this.fileCode[this.currentPropName] = this.currentObject;
       }
     }

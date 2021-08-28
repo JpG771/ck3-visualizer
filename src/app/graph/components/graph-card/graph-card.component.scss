@@ -1,0 +1,29 @@
+.extended {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  width: 100%;
+  margin-bottom: 0;
+  border-radius: 0;
+
+  .mat-card-title, .mat-card-content {
+    margin-right: 1em;
+  }
+  
+  display: flex;
+  flex-direction: column;
+  .mat-card-content {
+    flex: 1;
+  }
+}
+
+.mat-card-title {
+  display: flex;
+  align-items: center;
+}
+.text {
+  flex: 1 1 auto;
+}

@@ -1,0 +1,28 @@
+<mat-card [class.extended]="extended">
+  <mat-card-header>
+    <mat-card-title>
+      <div class="text">{{ header }}</div>
+      <div class="icon">
+        <button
+          *ngIf="!extended"
+          (click)="extendView(true)"
+          mat-icon-button
+          title="Extend view"
+        >
+          <mat-icon>open_in_full</mat-icon>
+        </button>
+        <button
+          *ngIf="extended"
+          (click)="extendView(false)"
+          mat-icon-button
+          title="Minimize view"
+        >
+          <mat-icon>unfold_less</mat-icon>
+        </button>
+      </div>
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content #container>
+    <div [id]="graphId"></div>
+  </mat-card-content>
+</mat-card>

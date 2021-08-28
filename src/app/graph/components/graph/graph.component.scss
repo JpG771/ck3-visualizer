@@ -9,7 +9,7 @@
   flex-wrap: wrap;
 
   & > * {
-    overflow: hidden;
+    display: block;
     width: 100%;
     margin-bottom: 1em;
   }
@@ -19,10 +19,10 @@
   .section {
     flex-direction: row;
 
-    &.life > .mat-card, &.top > .mat-card, &.proportions > .mat-card {
+    &.life > *, &.top > *, &.proportions > * {
       width: 46%;
       &.age-group {
-        width: 100%; // For 3 items
+        width: 96%; // For 3 items
       }
     }
   }

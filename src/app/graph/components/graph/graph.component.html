@@ -25,43 +25,14 @@
 </div>
 <h2>Living characters proportion</h2>
 <div class="section proportions">
-  <mat-card>
-    <mat-card-header><mat-card-title>Sex</mat-card-title></mat-card-header>
-    <mat-card-content><div id="sexChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header
-      ><mat-card-title>Sexuality</mat-card-title></mat-card-header
-    >
-    <mat-card-content><div id="sexualityChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header><mat-card-title>Culture</mat-card-title></mat-card-header>
-    <mat-card-content><div id="cultureChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header><mat-card-title>Religion</mat-card-title></mat-card-header>
-    <mat-card-content><div id="faithChart"></div></mat-card-content>
-  </mat-card>
+  <app-graph-card header="Sex" graphId="sexChart"></app-graph-card>
+  <app-graph-card header="Sexuality" graphId="sexualityChart"></app-graph-card>
+  <app-graph-card header="Culture" graphId="cultureChart"></app-graph-card>
+  <app-graph-card header="Religion" graphId="faithChart"></app-graph-card>
 </div>
 <h2>Life</h2>
 <div class="section life">
-  <mat-card>
-    <mat-card-header
-      ><mat-card-title>Births & deaths by Year</mat-card-title></mat-card-header
-    >
-    <mat-card-content><div id="birthByYearChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header
-      ><mat-card-title>Life expectancy by Year</mat-card-title></mat-card-header
-    >
-    <mat-card-content><div id="lifeExpectancyChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card class="age-group">
-    <mat-card-header
-      ><mat-card-title>Age Groups</mat-card-title></mat-card-header
-    >
-    <mat-card-content><div id="ageGroupChart"></div></mat-card-content>
-  </mat-card>
+  <app-graph-card header="Births & deaths by Year" graphId="birthByYearChart"></app-graph-card>
+  <app-graph-card header="Life expectancy by Year" graphId="lifeExpectancyChart"></app-graph-card>
+  <app-graph-card header="Age Groups" graphId="ageGroupChart" class="age-group"></app-graph-card>
 </div>

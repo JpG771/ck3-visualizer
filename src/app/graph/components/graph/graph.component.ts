@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Ck3Service } from 'src/app/core/services/ck3.service';
 import { Ck3Date } from 'src/app/shared/models/base';
 import { Character, DeadCharacter } from 'src/app/shared/models/character';
@@ -19,6 +20,7 @@ export interface GraphItem {
   selector: 'app-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GraphComponent implements OnInit {
   population = 0;
@@ -50,7 +52,10 @@ export class GraphComponent implements OnInit {
   };
   skillToLabel = skillToLabel;
 
-  constructor(private ck3Service: Ck3Service) {}
+  constructor(
+    private ck3Service: Ck3Service,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.aggregateData(this.ck3Service.currentData);
@@ -95,6 +100,8 @@ export class GraphComponent implements OnInit {
         averageLifeExpectancyData
       ]);
       await delayFunction(this.buildAgeGroupChart, ['ageGroupChart', ageGroupData]);
+    } else {
+      //this.router.navigate(['..', 'file', 'read']);
     }
   }
 
