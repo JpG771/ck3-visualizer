@@ -13,3 +13,14 @@ export const dateToObject = (
   }
   return undefined;
 };
+
+/**
+ * Calculte the years between two CK3 dates.
+ * TODO : Use month and day to precisely calculate the difference.
+ */
+export const yearDifference = (ck3DateFrom: Ck3Date, ck3DateTo: Ck3Date) => {
+  const dateFrom = dateToObject(ck3DateFrom);
+  const dateTo = dateToObject(ck3DateTo);
+  if (dateTo && dateFrom) return dateTo.year - dateFrom.year;
+  return 0;
+}

@@ -4,7 +4,7 @@ import {
   ChangeDetectionStrategy,
   AfterViewInit,
   OnDestroy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
 } from '@angular/core';
 import { Ck3Service } from '../../services/ck3.service';
 
@@ -108,7 +108,6 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.cancel = true;
     this.changeRef.markForCheck();
-    this.fileCode = { ...this.fileCode };
   }
 
   readLineAsync(line: string) {
@@ -127,6 +126,7 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
   currentParents: objectAnyProp[] = [];
   currentObject?: objectAnyProp;
   currentPropName?: string;
+  previousAction: string = '';
   currentLevel = 0;
   skip = false;
   skipLevel = 0;
@@ -150,7 +150,7 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
     return '';
   }
 
-  /** 
+  /**
    * Should we create a new object, assign value, close object?
    * Because of the chaotic data organisation, we need to verify each parts
    * Multiple parts could be on same line or not
@@ -160,6 +160,7 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
     const indexOfEqual = fixedNewProp.indexOf('=');
     const indexOfObjectOpen = fixedNewProp.indexOf('{');
     const indexOfObjectClosure = fixedNewProp.indexOf('}');
+    const indexOfString = fixedNewProp.indexOf('"');
     // if (newProp === 'break') {
     //   // For debugging
     //   return 'break';
@@ -168,8 +169,10 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       return '';
     } else if (
       indexOfEqual > 0 &&
+      (indexOfString < 0 || indexOfEqual < indexOfString) &&
       (indexOfObjectOpen < 0 || indexOfEqual < indexOfObjectOpen)
     ) {
+      this.previousAction = 'Equal';
       this.currentPropName = fixedNewProp.slice(0, indexOfEqual);
       const value = fixedNewProp.slice(indexOfEqual + 1);
 
@@ -188,12 +191,18 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.currentPropName) {
         this.setMultiValues(fixedNewProp, this.currentPropName);
       }
+      this.previousAction = 'Equal';
     } else if (indexOfObjectOpen >= 0) {
       // Start new object
       if (!this.skip) {
+        if (this.previousAction === 'Open') {
+          // Multi object open, reset attribute to data
+          this.currentPropName = 'data';
+        }
         this.skipLevel = this.currentLevel;
         this.openObject();
       }
+      this.previousAction = 'Open';
       this.currentLevel++;
       const value = fixedNewProp.slice(1);
       return this.verifyValue(value);
@@ -203,9 +212,11 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
         const value = fixedNewProp.slice(0, indexOfObjectClosure);
         this.setValue(value, this.currentPropName);
       }
+      this.previousAction = 'Equal';
       const valueLeft = fixedNewProp.slice(indexOfObjectClosure);
       return this.verifyValue(valueLeft);
     } else if (indexOfObjectClosure === 0) {
+      this.previousAction = 'Close';
       this.currentLevel--;
       if (!this.skip || this.currentLevel === this.skipLevel) {
         this.skipLevel--;
@@ -216,6 +227,7 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.verifyValue(value);
     } else if (this.currentPropName) {
       this.setValue(fixedNewProp, this.currentPropName);
+      this.previousAction = 'Equal';
     } else if (!this.skip) {
       return `Value not handled :  ${fixedNewProp}`;
     }
@@ -224,7 +236,9 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private setValue(value: string, propName: string) {
     let fixedValue = value.trim().replace('"', '').replace('"', '');
-    const currentValue = this.currentObject ? this.currentObject[propName] : this.fileCode[propName];
+    const currentValue = this.currentObject
+      ? this.currentObject[propName]
+      : this.fileCode[propName];
     if (currentValue) {
       fixedValue = currentValue + ' ' + fixedValue;
     }
@@ -254,9 +268,6 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private openObject() {
     if (!this.currentPropName) {
-      // TODO : Maybe rework this part to change this.currentObject into an array?
-      // This case can appen with a line like this `data={ {`
-      // data is an object but inside of it there are unnamed objects
       this.currentPropName = 'data';
     }
     if (this.currentPropName) {
@@ -283,9 +294,9 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       } else {
         this.currentObject = {};
+        if (['culture', 'data', 'date'].includes(this.currentPropName)) debugger;
         this.fileCode[this.currentPropName] = this.currentObject;
       }
-      this.currentPropName = undefined;
     }
   }
 
@@ -296,6 +307,9 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private isPropertyUsed() {
     const list = [
+      'meta_data',
+      'meta_date',
+
       'living',
       'first_name',
       'birth',
@@ -303,21 +317,33 @@ export class ReadFileComponent implements OnInit, AfterViewInit, OnDestroy {
       'culture',
       'faith',
       'sexuality',
+      'skill',
       'dead_unprunable',
       'characters',
       'dead_prunable',
       'dead_data',
-      'date'
+      'date',
+
+      'culture_manager',
+      'cultures',
+      'culture_template',
+
+      'religion',
+      'religions',
+      'template',
+      'faiths',
     ];
-    let propNameNumber = 0;
-    if (this.currentPropName) { 
+    let propNameNumber: number | undefined;
+    if (this.currentPropName) {
       try {
         propNameNumber = parseInt(this.currentPropName, 10);
       } catch (error) {}
     }
     if (
       (this.currentPropName && list.includes(this.currentPropName)) ||
-      (this.skip === false && propNameNumber > 0)
+      (this.skip === false &&
+        propNameNumber !== undefined &&
+        !isNaN(propNameNumber))
     ) {
       return true;
     }

@@ -1,23 +1,47 @@
 <h1>Statistics</h1>
-<h2>Proportion</h2>
+<h2>Top living characters</h2>
+<div class="section top">
+  <mat-card>
+    <mat-card-header
+      ><mat-card-title>Tim bits</mat-card-title></mat-card-header
+    >
+    <mat-card-content>
+      <div><b>Population : </b>{{ population.toLocaleString() }}</div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card>
+    <mat-card-header
+      ><mat-card-title>Best stats</mat-card-title></mat-card-header
+    >
+    <mat-card-content>
+      <div><b>Diplomacy : </b>{{ bestCharacter.diplomacy.name }} - {{ skillToLabel(bestCharacter.diplomacy.value) }} ({{ bestCharacter.diplomacy.value }})</div>
+      <div><b>Martial : </b>{{ bestCharacter.martial.name }} - {{ skillToLabel(bestCharacter.martial.value) }} ({{ bestCharacter.martial.value }})</div>
+      <div><b>Stewardship : </b>{{ bestCharacter.stewardship.name }} - {{ skillToLabel(bestCharacter.stewardship.value) }} ({{ bestCharacter.stewardship.value }})</div>
+      <div><b>Intrigue : </b>{{ bestCharacter.intrigue.name }} - {{ skillToLabel(bestCharacter.intrigue.value) }} ({{ bestCharacter.intrigue.value }})</div>
+      <div><b>Learning : </b>{{ bestCharacter.learning.name }} - {{ skillToLabel(bestCharacter.learning.value) }} ({{ bestCharacter.learning.value }})</div>
+      <div><b>Prowess : </b>{{ bestCharacter.prowess.name }} - {{ skillToLabel(bestCharacter.prowess.value) }} ({{ bestCharacter.prowess.value }})</div>
+    </mat-card-content>
+  </mat-card>
+</div>
+<h2>Living characters proportion</h2>
 <div class="section proportions">
   <mat-card>
     <mat-card-header><mat-card-title>Sex</mat-card-title></mat-card-header>
     <mat-card-content><div id="sexChart"></div></mat-card-content>
   </mat-card>
   <mat-card>
-    <mat-card-header><mat-card-title>Culture</mat-card-title></mat-card-header>
-    <mat-card-content><div id="cultureChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
-    <mat-card-header><mat-card-title>Faith</mat-card-title></mat-card-header>
-    <mat-card-content><div id="faithChart"></div></mat-card-content>
-  </mat-card>
-  <mat-card>
     <mat-card-header
       ><mat-card-title>Sexuality</mat-card-title></mat-card-header
     >
     <mat-card-content><div id="sexualityChart"></div></mat-card-content>
+  </mat-card>
+  <mat-card>
+    <mat-card-header><mat-card-title>Culture</mat-card-title></mat-card-header>
+    <mat-card-content><div id="cultureChart"></div></mat-card-content>
+  </mat-card>
+  <mat-card>
+    <mat-card-header><mat-card-title>Religion</mat-card-title></mat-card-header>
+    <mat-card-content><div id="faithChart"></div></mat-card-content>
   </mat-card>
 </div>
 <h2>Life</h2>
@@ -34,8 +58,10 @@
     >
     <mat-card-content><div id="lifeExpectancyChart"></div></mat-card-content>
   </mat-card>
+  <mat-card class="age-group">
+    <mat-card-header
+      ><mat-card-title>Age Groups</mat-card-title></mat-card-header
+    >
+    <mat-card-content><div id="ageGroupChart"></div></mat-card-content>
+  </mat-card>
 </div>
-<!--
-<h2>Top characters</h2>
-<div class="section top"></div>
--->
