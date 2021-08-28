@@ -6,6 +6,7 @@ import { Religion } from 'src/app/shared/models/religion';
 import { sortArrayByNumber } from 'src/app/shared/utils/array.util';
 import { skillToLabel } from 'src/app/shared/utils/attributes.util';
 import { dateToObject, yearDifference } from 'src/app/shared/utils/date.util';
+import { delayFunction } from 'src/app/shared/utils/delayAsync';
 import { translateSexLabel } from 'src/app/shared/utils/sex.util';
 import { toTitleCase } from 'src/app/shared/utils/string.util';
 
@@ -55,7 +56,7 @@ export class GraphComponent implements OnInit {
     this.aggregateData(this.ck3Service.currentData);
   }
 
-  private aggregateData(data: any) {
+  private async aggregateData(data: any) {
     if (data) {
       const sexData: GraphItem[] = [
         { label: 'Male', value: 0 },
@@ -71,82 +72,90 @@ export class GraphComponent implements OnInit {
 
       // Get Data
       this.population = Object.keys(data.living).length;
-      for (const key in data.living) {
-        if (Object.prototype.hasOwnProperty.call(data.living, key)) {
-          const element = data.living[key];
-          this.aggregateSexData(sexData, element);
-          this.aggregateIdData(
-            cultureData,
-            element,
-            (element) => element.culture
-          );
-          this.aggregateIdData(faithData, element, (element) => element.faith);
-          this.aggregateIdData(
-            sexualityData,
-            element,
-            (element) => element.sexuality,
-            translateSexLabel
-          );
-          this.aggregateIdData(birthByYearData, element, this.getBirthYear);
-          this.aggregateIdData(
-            ageGroupData,
-            element,
-            this.getAgeGroup(data.meta_data?.meta_date)
-          );
-          this.getBestCharacter(element);
-        }
-      }
-      for (const key in data.dead_unprunable) {
-        if (Object.prototype.hasOwnProperty.call(data.dead_unprunable, key)) {
-          const element = data.dead_unprunable[key];
-          this.aggregateIdData(birthByYearData, element, this.getBirthYear);
-          this.aggregateIdData(deadByYearData, element, this.getDeathYear);
-          this.averageData(
-            averageLifeExpectancyData,
-            element,
-            this.getLifeExpectancy,
-            this.getDeathYear
-          );
-        }
-      }
-      for (const key in data.characters.dead_prunable) {
-        if (
-          Object.prototype.hasOwnProperty.call(
-            data.characters.dead_prunable,
-            key
-          )
-        ) {
-          const element = data.characters.dead_prunable[key];
-          this.aggregateIdData(birthByYearData, element, this.getBirthYear);
-          this.aggregateIdData(deadByYearData, element, this.getDeathYear);
-          this.averageData(
-            averageLifeExpectancyData,
-            element,
-            this.getLifeExpectancy,
-            this.getDeathYear
-          );
-        }
-      }
+      await this.getLivingData(data, sexData, cultureData, faithData, sexualityData, birthByYearData, ageGroupData);
+      await this.getDeadUnprunableData(data, birthByYearData, deadByYearData, averageLifeExpectancyData);
+      await this.getDeadPrunableData(data, birthByYearData, deadByYearData, averageLifeExpectancyData);
 
       // Translate labels
       this.setCultureLabel(data, cultureData);
       this.setFaithLabel(data, faithData);
 
       // Build charts
-      this.buildPieChart('sexChart', sexData);
-      this.buildPieChart('sexualityChart', sexualityData);
-      this.buildPieChart('faithChart', faithData);
-      this.buildCultureChart('cultureChart', cultureData);
-      this.buildBirthdayChart(
+      await delayFunction(this.buildPieChart, ['sexChart', sexData]);
+      await delayFunction(this.buildPieChart, ['sexualityChart', sexualityData]);
+      await delayFunction(this.buildPieChart, ['faithChart', faithData]);
+      await delayFunction(this.buildCultureChart, ['cultureChart', cultureData, this.population]);
+      await delayFunction(this.buildBirthdayChart, [
         'birthByYearChart',
         birthByYearData,
         deadByYearData
-      );
-      this.buildLifeExpectancyChart(
+      ]);
+      await delayFunction(this.buildLifeExpectancyChart, [
         'lifeExpectancyChart',
         averageLifeExpectancyData
-      );
-      this.buildAgeGroupChart('ageGroupChart', ageGroupData);
+      ]);
+      await delayFunction(this.buildAgeGroupChart, ['ageGroupChart', ageGroupData]);
+    }
+  }
+
+  private async getDeadPrunableData(data: any, birthByYearData: GraphItem[], deadByYearData: GraphItem[], averageLifeExpectancyData: GraphItem[]) {
+    for (const key in data.characters.dead_prunable) {
+      if (Object.prototype.hasOwnProperty.call(
+        data.characters.dead_prunable,
+        key
+      )) {
+        const element = data.characters.dead_prunable[key];
+        this.aggregateIdData(birthByYearData, element, this.getBirthYear);
+        this.aggregateIdData(deadByYearData, element, this.getDeathYear);
+        this.averageData(
+          averageLifeExpectancyData,
+          element,
+          this.getLifeExpectancy,
+          this.getDeathYear
+        );
+      }
+    }
+  }
+  private async getDeadUnprunableData(data: any, birthByYearData: GraphItem[], deadByYearData: GraphItem[], averageLifeExpectancyData: GraphItem[]) {
+    for (const key in data.dead_unprunable) {
+      if (Object.prototype.hasOwnProperty.call(data.dead_unprunable, key)) {
+        const element = data.dead_unprunable[key];
+        this.aggregateIdData(birthByYearData, element, this.getBirthYear);
+        this.aggregateIdData(deadByYearData, element, this.getDeathYear);
+        this.averageData(
+          averageLifeExpectancyData,
+          element,
+          this.getLifeExpectancy,
+          this.getDeathYear
+        );
+      }
+    }
+  }
+  private async getLivingData(data: any, sexData: GraphItem[], cultureData: GraphItem[], faithData: GraphItem[], sexualityData: GraphItem[], birthByYearData: GraphItem[], ageGroupData: GraphItem[]) {
+    for (const key in data.living) {
+      if (Object.prototype.hasOwnProperty.call(data.living, key)) {
+        const element = data.living[key];
+        this.aggregateSexData(sexData, element);
+        this.aggregateIdData(
+          cultureData,
+          element,
+          (element) => element.culture
+        );
+        this.aggregateIdData(faithData, element, (element) => element.faith);
+        this.aggregateIdData(
+          sexualityData,
+          element,
+          (element) => element.sexuality,
+          translateSexLabel
+        );
+        this.aggregateIdData(birthByYearData, element, this.getBirthYear);
+        this.aggregateIdData(
+          ageGroupData,
+          element,
+          this.getAgeGroup(data.meta_data?.meta_date)
+        );
+        this.getBestCharacter(element);
+      }
     }
   }
 
@@ -278,7 +287,7 @@ export class GraphComponent implements OnInit {
 
     Plotly.newPlot(chartId, pieData, undefined, { responsive: true });
   }
-  private buildAgeGroupChart(chartId: string, data: GraphItem[]) {
+  private buildAgeGroupChart = (chartId: string, data: GraphItem[]) => {
     data.sort((itemA: any, itemB: any) => {
       return itemA.label - itemB.label;
     });
@@ -294,7 +303,7 @@ export class GraphComponent implements OnInit {
     ];
     Plotly.newPlot(chartId, chartData, undefined, { responsive: true });
   }
-  private buildCultureChart(chartId: string, data: GraphItem[]) {
+  private buildCultureChart(chartId: string, data: GraphItem[], population: number) {
     data = data.filter((item) => item.label !== 'None');
     data.sort((itemA, itemB) => itemA.value - itemB.value);
 
@@ -307,7 +316,7 @@ export class GraphComponent implements OnInit {
         text: data.map(
           (item) =>
             `${item.label} (${
-              Math.round((item.value / this.population) * 1000) / 10
+              Math.round((item.value / population) * 1000) / 10
             }%)`
         ),
         textinfo: 'label+percent',
